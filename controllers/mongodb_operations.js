@@ -2,8 +2,8 @@ const mongoose = require("mongoose");
 const User = require("../model/user");
 // const bcrypt = require('bcrypt');
 
-// const mongodbConnection = `mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_URL}/test`;
-const mongodbConnection = `mongodb+srv://sensosachatapp2022:MynameisKenn88.@cluster0.eahgm4e.mongodb.net/test`;
+const mongodbConnection = `mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_URL}/test`;
+// const mongodbConnection = `mongodb+srv://sensosachatapp2022:MynameisKenn88.@cluster0.eahgm4e.mongodb.net/test`;
 mongoose.connect(mongodbConnection);
 
 const db = mongoose.connection;
@@ -23,7 +23,7 @@ function _makeUser(dbUser) {
 }
 
 //Adding a User
-async function addUser(update, user) {
+async function addUser(update) {
   const newUser = User.create({
     firstName: update.firstName,
     lastName: update.lastName,
