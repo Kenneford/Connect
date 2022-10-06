@@ -6,6 +6,7 @@ const {
   getUsers,
   getUserByID,
   deleteUserByID,
+  validatePassword,
 } = require("../controllers/mongodb_operations");
 
 function sendErrorOutput(err, res) {
@@ -16,10 +17,25 @@ function sendErrorOutput(err, res) {
 
 router.post("/", (req, res) => {
   addUser(req.body)
-    .then((newUser) => {
-      res.status(201).send(newUser);
+    .then((data) => {
+      res.status(201).send(data);
     })
     .catch((err) => sendErrorOutput(err, res));
+});
+
+router.post("/", (req, res) => {
+  const token = validatePassword(req.body);
+  if (token) {
+    res.send({
+      status: "OK",
+      sessionToken: token,
+    });
+  } else {
+    res.status(403).send({
+      status: "ERROR",
+      message: "username or password is not correct",
+    });
+  }
 });
 
 router.get("/", (req, res) => {
