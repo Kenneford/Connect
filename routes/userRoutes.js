@@ -2,11 +2,12 @@ const express = require("express");
 const router = express.Router();
 
 const {
-  addUser,
-  getUsers,
+  userSignup,
+  getSignedUpUsers,
   getUserByID,
   deleteUserByID,
-  validatePassword,
+  validateUser,
+  authenticateToken,
 } = require("../controllers/mongodb_operations");
 
 function sendErrorOutput(err, res) {
@@ -15,36 +16,41 @@ function sendErrorOutput(err, res) {
   });
 }
 
-router.post("/", (req, res) => {
-  addUser(req.body)
-    .then((data) => {
-      res.status(201).send(data);
-    })
-    .catch((err) => sendErrorOutput(err, res));
+router.post("/signup", (req, res) => {
+  userSignup(req.body);
+  res.sendStatus(201);
 });
 
-router.post("/", (req, res) => {
-  const token = validatePassword(req.body);
-  if (token) {
-    res.send({
-      status: "OK",
-      sessionToken: token,
-    });
-  } else {
-    res.status(403).send({
-      status: "ERROR",
-      message: "username or password is not correct",
-    });
+// router.post("/login", (req, res) => {
+//   const token = validateUser(req.body);
+//   if (token) {
+//     res.send({
+//       status: "OK",
+//       sessionToken: token,
+//     });
+//   } else {
+//     res.status(403).send({
+//       status: "ERROR",
+//       message: "username or password is not correct",
+//     });
+//   }
+// });
+router.post("/login", async (req, res) => {
+  const token = await validateUser(req.body);
+  if (!token) {
+    res.status(403).send({ error: "Authentication failed" });
+    return;
   }
+  res.send(token);
 });
 
-router.get("/", (req, res) => {
-  getUsers()
-    .then((users) => {
-      res.json(users);
-    })
-    .catch((err) => sendErrorOutput(err, res));
+router.get("/", async (req, res) => {
+  res.send(await getSignedUpUsers());
 });
+
+// router.get("/", authenticateToken, async (req, res) => {
+//   res.send(await getSignedUpUsers());
+// });
 
 router.get("/:id", (req, res) => {
   const { id } = req.params;
